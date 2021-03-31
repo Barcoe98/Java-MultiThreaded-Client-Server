@@ -14,7 +14,14 @@ public class Client extends JFrame {
 
   // Text area to display contents
   private JTextArea jta = new JTextArea();
+  
+  //Exit Button
+  JButton exit = new JButton("Exit");
 
+  // username and total logins for user
+  public static String username = "";
+  public static String total_logins = "";
+  
   // IO streams
   public DataInputStream fromServer;
   public DataOutputStream toServer;
@@ -44,6 +51,14 @@ public class Client extends JFrame {
 	    setSize(500, 300);
 	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    setVisible(true); // It is necessary to show the frame here!
+	    
+	    jta.append("Welcome " + username + '\n' + "You have logged in " + total_logins + " " + "Times" + '\n');
+
+	    //handles exit button
+		//when clicked program is closed
+	    add(exit,BorderLayout.SOUTH);  
+		exit.addActionListener(e -> System.exit(0));
+		
    
     try {
     	
@@ -55,6 +70,7 @@ public class Client extends JFrame {
 		// obtaining input and out streams 
 		fromServer = new DataInputStream(socket.getInputStream()); 
 		toServer = new DataOutputStream(socket.getOutputStream());
+		toServer.writeUTF(username);
 		
 		jta.append("Connection to Server Established" + '\n');
 
@@ -89,7 +105,5 @@ public class Client extends JFrame {
       
     }
   }
-  
-  
   
 }

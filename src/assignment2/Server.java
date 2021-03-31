@@ -15,13 +15,11 @@ import java.util.Date;
 
 public class Server extends JFrame {
 	
-	  // Text area for displaying contents
+	// Text area for displaying contents
 	JTextArea jta = new JTextArea();
 	JButton exit = new JButton("Exit");
-	String username = Login.username;
-	
+	String currentUsername;
 
-	
 	
 	public static void main(String[] args) { 
 		 new Server();
@@ -37,10 +35,11 @@ public class Server extends JFrame {
     setSize(500, 300);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true); // It is necessary to show the frame here!
+    
     //Exit Button
     add(exit,BorderLayout.SOUTH);  
     
-	//handles reload button
+	//handles exit button
 	//when clicked program is closed
 	exit.addActionListener(e -> System.exit(0));
 	
@@ -55,15 +54,18 @@ public class Server extends JFrame {
 			
 			//Listen for connection request
 			Socket socket = serverSocket.accept(); 
-			jta.append("A new client " + username + "is connected : " + serverSocket + '\n'); 
+			
+			//read username from output of server			
+			DataInputStream fromClient = new DataInputStream(socket.getInputStream());
+			currentUsername = fromClient.readUTF();
 
+			//append curent user username
+			jta.append("A new client " + currentUsername + " is connected : " + socket + '\n'); 
+			
 			//Connect to a client thread
 			Thread t = new ThreadClass(socket); 
-			System.out.println("Assigning new thread for this client" + '\n'); 
+			System.out.println("Assigning new thread for " + currentUsername + '\n'); 
 			t.start();
-		
-//		    jta.append("Radius received from client: " + radius + '\n');
-//		    jta.append("Area found: " + area + '\n');
 				
 		}
 	} catch (IOException e) { 

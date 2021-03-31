@@ -9,7 +9,6 @@ import java.net.Socket;
 public class ThreadClass extends Thread {
 	
 	private Socket socket;
-	@SuppressWarnings("unused")
 	private InetAddress address;
 	private DataInputStream inputFromClient;
 	private DataOutputStream outputToClient;
@@ -18,7 +17,7 @@ public class ThreadClass extends Thread {
 		this.socket = socket;
 		address = socket.getInetAddress();
 		try { 
-			System.out.print("Server IS/DOS ");
+			System.out.print("Server IS/DOS" + '\n');
 			inputFromClient = new DataInputStream(socket.getInputStream());
 			outputToClient = new DataOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
@@ -26,7 +25,6 @@ public class ThreadClass extends Thread {
 			e.printStackTrace();
 		}
 	}
-	
 	
 	public void run() {
 		
@@ -44,10 +42,6 @@ public class ThreadClass extends Thread {
 			}
 		} catch (Exception e) {
 			System.err.println(e + "on" + socket);
-		}
-		
+		}	
 	}
-
-		
-
 }

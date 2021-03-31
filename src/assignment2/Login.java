@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+
 import javax.swing.JButton;  
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,17 +26,23 @@ import java.sql.Statement;
  * References *
  * https://stackoverflow.com/questions/8632705/how-to-close-a-gui-when-i-push-a-jbutton
  * https://www.javaguides.net/2019/07/login-application-using-java-swing-jdbc-mysql-example-tutorial.html
+ * 
+ * Test account 
+ * Username - test
+ * Password - test
  */
 
 public class Login {
 
-	public static ResultSet rs;
+	static ResultSet rs;
 	static Connection con;
 	static PreparedStatement st;
-	static PreparedStatement login_counter_st;
+	static PreparedStatement st2;
 
 	//User variables
-	static public String  username="", password ="";
+	static String  username="", password ="";
+	static String total_logins = "";
+	static String loggedInUsername = "";
 	static JFrame frame = new JFrame();
     
 	//Field Labels
@@ -102,6 +109,10 @@ public class Login {
         lblLogin.setBounds(120, 5, 60, 30);
         lblLogin.setFont(new Font("Tahoma", Font.BOLD, 20));
         
+		//handles reload button
+		//when clicked program is closed
+		exit.addActionListener(e -> System.exit(0));
+        
 		//Handles Save Button
 		//login user and display client window
 		login.addActionListener(new ActionListener() {
@@ -112,7 +123,7 @@ public class Login {
                 
                 try {
                     con = DriverManager.getConnection("jdbc:mysql://localhost:3306/assign2", "root", "");
-                    st = con.prepareStatement("Select username, password from students where username=? and password=?");
+                    st = con.prepareStatement("Select username, password, TOT_LOGINS from students where username=? and password=?");
 
                     st.setString(1, userName);
                     st.setString(2, password);
@@ -121,20 +132,26 @@ public class Login {
                     
 					if (rs.next()) {
 						
-						// Increase counter by 1 each time the sure logs in 
-						login_counter_st.setString(1, userName);
-	                    login_counter_st = con.prepareStatement("Update students set TOT_LOGINS + 1 where username=?" );
-	                    rs = login_counter_st.executeQuery();
-
+						// Increase counter by 1 each time the user logs in 
+	                    st2 = con.prepareStatement("Update students set TOT_LOGINS = TOT_LOGINS + 1 where username=?" );
+						st2.setString(1, userName);
+						st2.executeUpdate();
 
 						//set login response label to green and user logged in
 				        loginResponse.setForeground(Color.GREEN);
 						loginResponse.setText("User Logged In");
 						System.out.println("User Logged In");
 						
-						//show dialog pame
+						//show dialog pop up
                         JOptionPane.showMessageDialog(ok, "Log in Successfully");
                         
+                        //get total log ins from result set
+                        total_logins = rs.getString("TOT_LOGINS");
+                        loggedInUsername = rs.getString("username");
+
+						Client.total_logins = total_logins;
+						Client.username = loggedInUsername;
+						
                         //launch client window
                         Client client = new Client();
                         client.setTitle("Welcome " + userName);
@@ -144,21 +161,16 @@ public class Login {
                         loginResponse.setForeground(Color.RED);
                     	loginResponse.setText("Incorrect Details");
                     	System.out.println("Incorrect Details");
-                        JOptionPane.showMessageDialog(ok, "Wrong Username & Password");
+                        JOptionPane.showMessageDialog(ok, "Incorrect Username & Password");
                     }
 					
                 } catch (SQLException sqlException) {
                     sqlException.printStackTrace();
                 }
-
+                
+                loggedInUsername = userName;
+				System.out.println(loggedInUsername);				
 			}
 		});
-		
-		//handles reload button
-		//when clicked program is closed
-		exit.addActionListener(e -> System.exit(0));
-
-
-	}
-
+	}	
 }
